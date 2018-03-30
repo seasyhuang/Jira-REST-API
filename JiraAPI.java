@@ -2,23 +2,17 @@ package hate;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
-import java.util.stream.StreamSupport;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.simple.JsonArray;
-import org.json.simple.JsonObject;
 import org.json.simple.Jsoner;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -63,6 +57,7 @@ public class JiraAPI {
 		}
 		
 		getLabels(responseJson);
+		getName(responseJson);
 		
 	}
 	
@@ -114,6 +109,22 @@ public class JiraAPI {
 		return labels;
 	}
 	
+	/* Usage:
+	 * See Usage for getLabels	 */
+	private static String getName(String response){
+	
+		JSONObject responseJson =  new JSONObject(response);
+		JSONObject jsonFields = responseJson.getJSONObject("fields");
+		JSONArray jsonIL = jsonFields.getJSONArray("issuelinks");
+		JSONObject jsonOI = jsonIL.getJSONObject(0);
+		JSONObject jsonOI2 = jsonOI.getJSONObject("outwardIssue");
+		JSONObject jsonFields2 = jsonOI2.getJSONObject("fields");
+		String summary = jsonFields2.getString("summary");
+		
+		System.out.println("ISSUE NAME: \""+ summary + "\"");
+
+		return summary;
+	}
 	
 	/* Usage:
 	 * 
@@ -152,9 +163,7 @@ public class JiraAPI {
 	}
 	
 	/* Usage:
-	 * See Usage for addLabels()
-	 */
-	
+	 * See Usage for addLabels()	 */
 	private static HttpPut removeLabels(String url, String issue, String ownerAuth) throws UnsupportedEncodingException {
 		
 		HttpPut httpRequest = new HttpPut(url + "issue/" + issue + "/");
