@@ -1,7 +1,11 @@
 package hate;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
+import java.util.stream.StreamSupport;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -11,6 +15,9 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.simple.JsonArray;
 import org.json.simple.JsonObject;
 import org.json.simple.Jsoner;
 import org.testng.annotations.Parameters;
@@ -39,36 +46,76 @@ public class JiraAPI {
 		
 		// ------------------------------------------------------------------------------------------------------------------
 		// Helper methods used here:
-//		HttpPut httpRequest = addLabels(url);
-		HttpPut httpRequest = removeLabels(url);
+		HttpGet httpRequest = getIssue(url, "PB-9655", ownerAuth);
+//		HttpPut httpRequest = addLabels(url, "PB-9655", ownerAuth);
+//		HttpPut httpRequest = removeLabels(url, "PB-9655", ownerAuth);
+
+		// Execute your request and catch response
+		String responseJson = "Response creation.";
+		
+		try {
+			HttpResponse response = httpClient.execute(httpRequest);
+			responseJson = EntityUtils.toString(response.getEntity(), "UTF-8");
+			System.out.println(Jsoner.prettyPrint(responseJson));
+		} catch (Exception e) {
+			responseJson = "No response.";
+			System.out.println(responseJson);
+		}
+		
+		getLabels(responseJson);
+		
+	}
+	
+	/* Usage:
+	 * 
+	 * HttpClient httpClient = HttpClientBuilder.create().build();
+	 * [CALL getIssue() HERE]
+	 */
+	private static HttpGet getIssue(String url, String issue, String ownerAuth){
+	
+		HttpGet httpRequest = new HttpGet(url + "issue/" + issue + "/");
 		
 		// Specifying the headers for the request
 		httpRequest.setHeader("Authorization", ownerAuth);
 		httpRequest.setHeader("Content-type", "application/json");
-
-		// Execute your request and catch response
-		String httpPostRequestPackageCreateResponseJson = "Response creation.";
 		
-		try {
-			HttpResponse httpPostRequestPackageCreateResponse = httpClient.execute(httpRequest);
-			httpPostRequestPackageCreateResponseJson = EntityUtils.toString(httpPostRequestPackageCreateResponse.getEntity(), "UTF-8");
-			
-		} catch (Exception e) {
-			httpPostRequestPackageCreateResponseJson = "No response.";
-		}
-		
-//		JsonObject createPackageResponseJsonObject = Jsoner.deserialize(httpPostRequestPackageCreateResponseJson, new JsonObject());
-		
-		System.out.println(Jsoner.prettyPrint(httpPostRequestPackageCreateResponseJson));
-		
-//		String packageId = (String) createPackageResponseJsonObject.get("id");
-//		
-//		System.out.println("Package id is: " + packageId);
+		return httpRequest;
 		
 	}
 	
-	/*
-	 * Usage:
+	/* Usage:
+	 * -- Must be used after getIssue() is called.
+	 * getIssue()
+	 * try {...} catch {...}
+	 * [CALL getLabels() HERE]
+	 */
+	private static ArrayList<String> getLabels(String response){
+	
+		JSONObject responseJson =  new JSONObject(response);
+		JSONObject jsonFields = responseJson.getJSONObject("fields");
+		JSONArray jsonLabels = jsonFields.getJSONArray("labels");
+		
+		// This converts the JSONArray of labels to a String ArrayList
+		ArrayList<String> labels = new ArrayList<String>();
+		for(int i = 0; i < jsonLabels.length(); i++){
+			labels.add(jsonLabels.getString(i));
+		}
+
+		// Printing out the ArrayList
+		int i = 0;
+		StringBuilder sb = new StringBuilder();
+		for (String s : labels) {
+			i++;
+		    sb.append(s);
+		    if (i != labels.size()) { sb.append(", "); }
+		}
+		System.out.println("LABELS: "+ sb.toString());
+
+		return labels;
+	}
+	
+	
+	/* Usage:
 	 * 
 	 * HttpClient httpClient = HttpClientBuilder.create().build();
 	 * [CALL addLabels() HERE]
@@ -78,9 +125,9 @@ public class JiraAPI {
 	 * Headers - Content-Type = application/json, Authorization = Basic [apiKey]
 	 * This method generates the body.
 	 */
-	private static HttpPut addLabels(String url) throws UnsupportedEncodingException {
+	private static HttpPut addLabels(String url, String issue, String ownerAuth) throws UnsupportedEncodingException {
 	
-		HttpPut httpRequest = new HttpPut(url + "issue/PB-9655/");
+		HttpPut httpRequest = new HttpPut(url + "issue/" + issue + "/");
 		/* 
 		 * This payload adds labels to the jira ticket. 
 		 * { "add": "label" }
@@ -96,18 +143,21 @@ public class JiraAPI {
 		StringEntity packagePayload = new StringEntity(packagePayloadString);
 		httpRequest.setEntity(packagePayload);
 		
+		// Specifying the headers for the request
+		httpRequest.setHeader("Authorization", ownerAuth);
+		httpRequest.setHeader("Content-type", "application/json");
+		
 		return httpRequest;
 		
 	}
 	
-	/*
-	 * Usage:
+	/* Usage:
 	 * See Usage for addLabels()
 	 */
 	
-	private static HttpPut removeLabels(String url) throws UnsupportedEncodingException {
+	private static HttpPut removeLabels(String url, String issue, String ownerAuth) throws UnsupportedEncodingException {
 		
-		HttpPut httpRequest = new HttpPut(url + "issue/PB-9655/");
+		HttpPut httpRequest = new HttpPut(url + "issue/" + issue + "/");
 		/* 
 		 * This payload removes labels to the jira ticket. 
 		 * { "remove": "label" }
@@ -124,9 +174,18 @@ public class JiraAPI {
 		StringEntity packagePayload = new StringEntity(packagePayloadString);
 		httpRequest.setEntity(packagePayload);
 		
+		// Specifying the headers for the request
+		httpRequest.setHeader("Authorization", ownerAuth);
+		httpRequest.setHeader("Content-type", "application/json");
+		
 		return httpRequest;
 		
 	}
+	
+	/*
+	 * This method generates the API key for Jira by 
+	 * base64 encoding your username and password.
+	 */
 	
 	private static String getAPIKey(String username, String password) {
 		String plainCreds = username + ":" + password;
