@@ -1,12 +1,9 @@
 package hate;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Base64;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
@@ -21,6 +18,8 @@ import org.testng.annotations.Test;
 
 public class JiraAPI {
 	
+//	https://developer.atlassian.com/cloud/jira/platform/rest/?_ga=2.89337049.392334728.1522427285-579278600.1515620759
+	
 	public JiraAPI() {
 	}
 
@@ -34,11 +33,32 @@ public class JiraAPI {
 		
 		String apiKey = getAPIKey(username, password);
 		String url = "https://jira." + domain +".com/rest/api/2/";
-		String issue = "PB-10190";
+//		String issue = "APP-8003";
 		String ownerAuth = "Basic " + apiKey;
 		// ------------------------------------------------------------------------------------------------------------------
 
-		removeLabels(url, issue, ownerAuth);
+		String[] issues = { 
+							"APP-7976", 
+							"APP-7972", 
+							"APP-7977", 
+							"APP-7982"	
+							};
+		
+		for (int i = 0; i < issues.length; i++) {
+			String issue = issues[i];
+			System.out.println(issue);
+
+			String oldName = getName(url, issue, ownerAuth);
+			String newName = oldName.replace("_ADA ", "_");
+			
+			System.out.print("CHANGING TO: ");
+			System.out.println(newName);
+			updateName(url, issue, ownerAuth, newName);
+			
+			System.out.print("NEW NAME: ");
+			getName(url, issue, ownerAuth);			
+		}
+		
 		
 	}
 	
@@ -62,7 +82,7 @@ public class JiraAPI {
 		String responseJson = "Response creation.";
 		try {
 			responseJson = EntityUtils.toString(response.getEntity(), "UTF-8");
-			System.out.println(Jsoner.prettyPrint(responseJson));
+//			System.out.println(Jsoner.prettyPrint(responseJson));
 		} catch (Exception e) {
 			responseJson = "No response.";
 			System.out.println(responseJson);
@@ -259,6 +279,13 @@ public class JiraAPI {
 		
 		return responseJson;
 		
+	}
+	
+	private static void updateADA(String url, String issue, String ownerAuth) throws Exception {
+		String oldName = getName(url, issue, ownerAuth);
+		System.out.println(oldName.replace("ADA", ""));
+		
+				
 	}
 	
 	/*
