@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="JiraAPI" parallel="none">
+	
+	<test name="JiraAPI" preserve-order="true">
+		<classes>
+			<class name="package.JiraAPI">
+				<methods>
+					
+					<parameter name="username" value="[username here]" />
+					<parameter name="password" value="[password here]" />
+					<parameter name="domain" value="[jira domain here]" />
+				
+				</methods>
+			</class>
+		</classes>
+	</test>
+</suite>
+
+

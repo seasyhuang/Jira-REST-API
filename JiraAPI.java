@@ -24,13 +24,14 @@ public class JiraAPI {
 	@Test
 	@Parameters ({
 			"username",
-			"password"
+			"password",
+			"domain"
 	})
-	public void testAPI(String username, String password) throws Exception {
+	public void testAPI(String username, String password, String domain) throws Exception {
 		
 		String apiKey = getAPIKey(username, password);
 		
-		String url = "https://jira.vasco.com/rest/api/2/";
+		String url = "https://jira." + domain +".com/rest/api/2/";
 		String ownerAuth = "Basic " + apiKey;
 
 		// Create HTTP Client
