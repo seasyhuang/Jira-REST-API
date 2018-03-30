@@ -195,7 +195,6 @@ public class JiraAPI {
 	 * This method generates the API key for Jira by 
 	 * base64 encoding your username and password.
 	 */
-	
 	private static String getAPIKey(String username, String password) {
 		String plainCreds = username + ":" + password;
 		byte[] base64CredsBytes = Base64.getEncoder().encode(plainCreds.getBytes());
