@@ -11,11 +11,19 @@ public class ToStringArray {
 		
 		// Paste from excel into the double quotes
 		// Output is the string array format (input for OpenTabs)
-		String input = "APP-8003\r\n" + 
-				"APP-7976\r\n" + 
-				"APP-7972\r\n" + 
-				"APP-7977\r\n" + 
-				"APP-7982";
+		String input = "PB-5548\r\n" + 
+				"PB-5630\r\n" + 
+				"PB-5641\r\n" + 
+				"PB-5546\r\n" + 
+				"PB-5660\r\n" + 
+				"PB-6247\r\n" + 
+				"PB-6344\r\n" + 
+				"PB-5999\r\n" + 
+				"PB-6821\r\n" + 
+				"PB-7493\r\n" + 
+				"PB-7887\r\n" + 
+				"PB-7275\r\n" + 
+				"PB-7505";
 		
 		String result = convert(input);
 		

@@ -33,33 +33,95 @@ public class JiraAPI {
 		
 		String apiKey = getAPIKey(username, password);
 		String url = "https://jira." + domain +".com/rest/api/2/";
-//		String issue = "APP-8003";
 		String ownerAuth = "Basic " + apiKey;
+		ArrayList<String> newSummary = new ArrayList<String>();
 		// ------------------------------------------------------------------------------------------------------------------
 
 		String[] issues = { 
-							"APP-7976", 
-							"APP-7972", 
-							"APP-7977", 
-							"APP-7982"	
+				"PB-5548", 
+				"PB-5630", 
+				"PB-5641", 
+				"PB-5546", 
+				"PB-5660", 
+				"PB-6247", 
+				"PB-6344", 
+				"PB-5999", 
+				"PB-6821", 
+				"PB-7493", 
+				"PB-7887", 
+				"PB-7275", 
+				"PB-7505"
+
 							};
 		
+		int index = 8;
+		String replace = "";
 		for (int i = 0; i < issues.length; i++) {
 			String issue = issues[i];
 			System.out.println(issue);
 
-			String oldName = getName(url, issue, ownerAuth);
-			String newName = oldName.replace("_ADA ", "_");
+//			String oldName = getName(url, issue, ownerAuth);
+////			String newName = modString(oldName);
+//			replace = "New UI - MVP Reporting Test Plan_MVP00" + index + "_";
+//			if (index > 9) { replace = "New UI - MVP Reporting Test Plan_MVP0" + index + "_"; }
+//			String newName = replace + oldName;
+//			index++;
+//			
+//			System.out.print("CHANGING TO: ");
+//			System.out.println(newName);
+//			updateName(url, issue, ownerAuth, newName);
 			
-			System.out.print("CHANGING TO: ");
-			System.out.println(newName);
-			updateName(url, issue, ownerAuth, newName);
+//			newSummary.add(newName);
+
+//			System.out.print("NEW NAME: ");
+//			newSummary.add(					
+//					getName(url, issue, ownerAuth)
+//					);
 			
-			System.out.print("NEW NAME: ");
-			getName(url, issue, ownerAuth);			
+			removeLabels(url, issue, ownerAuth);
+//			addLabels(url, issue, ownerAuth);
+			getLabels(url, issue, ownerAuth);
+			System.out.println("---------");
 		}
 		
+		System.out.println("#################################");
+		System.out.println("############## copy #############");
+		System.out.println("#################################");
 		
+		newSummary.forEach(System.out::println);
+		
+	}
+	
+	private static String modString(String oldName) {
+		String newName = "";
+		
+		if (oldName.contains("NEW UI")) {
+			oldName = oldName.replace("NEW UI", "New UI").trim();
+		}
+		
+		if (oldName.contains("New UI- ")) {
+			oldName = oldName.replace("New UI- ", "New UI - ").trim();
+		}
+				
+		if (oldName.contains("Classic UI- ")) {
+			oldName = oldName.replace("Classic UI- ", "Classic UI - ").trim();
+		}
+		
+		if (oldName.contains("\"")) {
+			oldName = oldName.replace("\"", "\\\"").trim();
+		}
+		
+		String old = "Evidence";
+		String replace = "Evidence and";
+		
+		newName = oldName.replace(old, replace).trim();
+
+		// Replacing " - " with "_" while preserving the test case numbers
+//		int stringlength = "New UI - Regular Test Plan_TC020".length();
+//		String temp = newName.substring(0, stringlength);
+//		newName = temp + "_" + newName.substring(stringlength+3, newName.length());
+
+		return newName;
 	}
 	
 	/* Usage:
@@ -213,8 +275,8 @@ public class JiraAPI {
 		String packagePayloadString = "{\r\n" + 
 				"	\"update\": {\r\n" + 
 				"			\"labels\": [\r\n" + 
-				"				{ \"add\": \"TESTING-JAVA\" },\r\n" + 
-				"				{ \"add\": \"is_cool2\" }\r\n" + 
+//				"				{ \"add\": \"TESTING-JAVA\" },\r\n" + 
+				"				{ \"add\": \"REST_API\" }\r\n" + 
 				"			]\r\n" + 
 				"	}\r\n" + 
 				"}";
@@ -254,8 +316,8 @@ public class JiraAPI {
 		String packagePayloadString = "{\r\n" + 
 				"	\"update\": {\r\n" + 
 				"			\"labels\": [\r\n" + 
-//				"				{ \"remove\": \"TESTING-JAVA\" },\r\n" + 
-				"				{ \"remove\": \"newlabel\" }\r\n" + 
+//				"				{ \"remove\": \"Unicorn_Sprint16\" },\r\n" + 
+				"				{ \"remove\": \"S3\" }\r\n" + 
 				"			]\r\n" + 
 				"	}\r\n" + 
 				"}";
